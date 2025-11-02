@@ -19,3 +19,12 @@ diffusers
 transformers
 accelerate
 safetensors
+
+flask
+torch
+diffusers
+transformers
+safetensors
+accelerate
+Pillow
+python-dotenv
