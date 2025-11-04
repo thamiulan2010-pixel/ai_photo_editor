@@ -16,9 +16,7 @@
   <button type="submit">Generate Anime</button>
 </form>
 
-<div class="result">
-
-</div>
+<div class="result"></div>
 
 <script>
 const form = document.getElementById("anime-form");
@@ -26,26 +24,50 @@ const resultDiv = document.querySelector(".result");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const formData = new FormData(form);
   const name = formData.get("name");
+  const imageFile = formData.get("image");
 
   resultDiv.innerHTML = '<div class="loader"></div>';
 
-  // GitHub Pages cannot run Python backend, so this will fail if trying to POST
-  // You can still test static UI, but image generation requires a server
-  const response = await fetch("/", {
-    method: "POST",
-    body: formData
-  });
+  // Convert uploaded image to Base64
+  const reader = new FileReader();
+  reader.onloadend = async () => {
+    const imageBase64 = reader.result;
 
-  const blob = await response.blob();
-  const imgURL = URL.createObjectURL(blob);
+    const payload = {
+      data: [name, imageBase64]
+    };
 
-  resultDiv.innerHTML = `
-    <img src="${imgURL}" alt="Generated Anime">
-    <div class="user-name">Edited for: ${name}</div>
-  `;
+    try {
+      const response = await fetch("https://thamiulan-ai-photo-editor.hf.space/run/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
+
+      const result = await response.json();
+
+      // Gradio returns image data under result.data[0]
+      const output = result.data[0];
+      const imageUrl = output.url || output; // handles both URL or Base64
+
+      resultDiv.innerHTML = `
+        <img src="${imageUrl}" alt="Generated Anime">
+        <div class="user-name">Edited for: ${name}</div>
+      `;
+    } catch (err) {
+      console.error(err);
+      resultDiv.innerHTML = `<p style="color:red;">❌ Error: Could not connect to AI server.<br>Please try again later.</p>`;
+    }
+  };
+
+  reader.readAsDataURL(imageFile);
 });
 </script>
+
 </body>
 </html>
