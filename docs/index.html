@@ -1,27 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Anime Generator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h1>AI Anime Generator</h1>
+  <!-- HEADER / HERO SECTION -->
+  <header>
+    <h1>🎨 AI Anime Generator</h1>
+    <p>Transform your photo into stunning anime art — powered by AI.</p>
+  </header>
 
-  <form id="anime-form">
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <input type="file" id="image" accept="image/*" required>
-    <button type="submit">Generate Anime</button>
-  </form>
+  <!-- MAIN UPLOAD CARD -->
+  <main>
+    <form id="anime-form" class="upload-card">
+      <label for="name" class="input-label">Your Name</label>
+      <input type="text" id="name" placeholder="Enter your name" required />
 
-  <div class="result"></div>
+      <label for="image" class="input-label">Upload Your Photo</label>
+      <div class="file-drop-area" id="drop-area">
+        <input type="file" id="image" accept="image/*" required />
+        <span>Drag & Drop or Click to Upload</span>
+      </div>
+
+      <button type="submit" class="btn-primary">Generate Anime</button>
+    </form>
+
+    <div class="result" id="result"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Built by <strong>Thamiulan</strong> ✨ Powered by Hugging Face</p>
+  </footer>
 
   <script>
     const form = document.getElementById("anime-form");
-    const resultDiv = document.querySelector(".result");
+    const resultDiv = document.getElementById("result");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -45,7 +64,7 @@
           const response = await fetch("https://thamiulan-ai-photo-editor.hf.space/run/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
           });
 
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -55,17 +74,18 @@
           const imageUrl = output.url || output;
 
           resultDiv.innerHTML = `
-            <img src="${imageUrl}" alt="Generated Anime">
-            <div class="user-name">Edited for: ${name}</div>
+            <div class="output-card">
+              <img src="${imageUrl}" alt="Generated Anime" />
+              <h3>Edited for: ${name}</h3>
+            </div>
           `;
         } catch (err) {
           console.error(err);
-          resultDiv.innerHTML = `<p style="color:red;">❌ Error: Could not connect to AI server.<br>Please try again later.</p>`;
+          resultDiv.innerHTML = `<p class="error">❌ Error: Could not connect to AI server.<br>Please try again later.</p>`;
         }
       };
       reader.readAsDataURL(file);
     });
   </script>
-
 </body>
 </html>
