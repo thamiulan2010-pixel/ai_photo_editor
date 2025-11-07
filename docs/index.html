@@ -4,38 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Anime Generator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- HEADER / HERO SECTION -->
-  <header>
-    <h1>🎨 AI Anime Generator</h1>
-    <p>Transform your photo into stunning anime art — powered by AI.</p>
+  <!-- Header / Hero -->
+  <header class="hero">
+    <h1 class="hero-title">AI Anime Generator</h1>
+    <p class="hero-subtitle">Turn your real photo into anime art — fast, beautiful, and magical ✨</p>
   </header>
 
-  <!-- MAIN UPLOAD CARD -->
-  <main>
+  <!-- Upload Section -->
+  <main class="container">
     <form id="anime-form" class="upload-card">
-      <label for="name" class="input-label">Your Name</label>
-      <input type="text" id="name" placeholder="Enter your name" required />
+      <h2>Upload Your Photo</h2>
+      <p class="note">Enter your name & upload an image to generate anime style</p>
 
-      <label for="image" class="input-label">Upload Your Photo</label>
-      <div class="file-drop-area" id="drop-area">
-        <input type="file" id="image" accept="image/*" required />
-        <span>Drag & Drop or Click to Upload</span>
+      <input type="text" id="name" placeholder="Your Name" required>
+
+      <div class="upload-box" id="drop-area">
+        <input type="file" id="image" accept="image/*" required>
+        <div class="upload-text">
+          <i>📷</i>
+          <span>Drag & Drop or Click to Upload</span>
+        </div>
       </div>
 
-      <button type="submit" class="btn-primary">Generate Anime</button>
+      <button type="submit" class="generate-btn">Generate Anime</button>
     </form>
 
     <div class="result" id="result"></div>
   </main>
 
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer>
-    <p>Built by <strong>Thamiulan</strong> ✨ Powered by Hugging Face</p>
+    <p>Created by <strong>Thamiulan</strong> • Powered by AI</p>
   </footer>
 
   <script>
@@ -74,14 +78,14 @@
           const imageUrl = output.url || output;
 
           resultDiv.innerHTML = `
-            <div class="output-card">
+            <div class="result-card">
               <img src="${imageUrl}" alt="Generated Anime" />
-              <h3>Edited for: ${name}</h3>
+              <h3>Generated for: ${name}</h3>
             </div>
           `;
         } catch (err) {
           console.error(err);
-          resultDiv.innerHTML = `<p class="error">❌ Error: Could not connect to AI server.<br>Please try again later.</p>`;
+          resultDiv.innerHTML = `<p class="error">❌ Connection failed. Please try again later.</p>`;
         }
       };
       reader.readAsDataURL(file);
