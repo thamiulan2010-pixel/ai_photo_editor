@@ -3,63 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Photo Editor | Enhance with Intelligence</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>AI Photo Editor</title>
+  <link rel="stylesheet" href="static/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <div class="logo">✨ AI Photo Editor</div>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">Features</a>
-      <a href="#">Gallery</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Enhance Your Photos with AI Magic</h1>
-      <p>Professional colour grading, detail enhancement, and auto-beautify — powered by AI.</p>
-      <a href="#" class="btn">Try Now</a>
-    </div>
-  </section>
+  <h1>AI Photo Editor</h1>
 
-  <!-- Features -->
-  <section class="features">
-    <h2>Why Choose Our Editor?</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h3>🎨 AI Colour Grading</h3>
-        <p>Transform dull photos into cinematic visuals with one click.</p>
-      </div>
-      <div class="feature-card">
-        <h3>⚡ Smart Enhancer</h3>
-        <p>Automatically improves clarity, brightness, and sharpness instantly.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🧠 Deep Learning</h3>
-        <p>Trained with millions of images for realistic, beautiful results.</p>
-      </div>
-    </div>
-  </section>
+  <form id="photo-form">
+    <input type="text" id="name" placeholder="Enter your name" required />
+    <input type="file" id="image" accept="image/*" required />
+    <button type="submit">Enhance Photo</button>
+  </form>
 
-  <!-- Gallery -->
-  <section class="gallery">
-    <h2>Before & After</h2>
-    <div class="gallery-grid">
-      <img src="images/edit1.jpg" alt="Edited Photo 1">
-      <img src="images/edit2.jpg" alt="Edited Photo 2">
-      <img src="images/edit3.jpg" alt="Edited Photo 3">
-    </div>
-  </section>
+  <div class="result"></div>
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 AI Photo Editor. Built with ❤️ and intelligence.</p>
-  </footer>
+  <script>
+    const form = document.getElementById("photo-form");
+    const resultDiv = document.querySelector(".result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const file = document.getElementById("image").files[0];
+      if (!file) return alert("Please upload an image.");
+
+      resultDiv.innerHTML = '<div class="loader"></div>';
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Image = reader.result;
+
+        const payload = { data: [name, base64Image] };
+
+        try {
+          const res = await fetch("https://thamiulan-ai-photo-editor.hf.space/run/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) throw new Error(`Server returned ${res.status}`);
+          const data = await res.json();
+
+          // Handle Gradio response
+          const output = data.data[0];
+          const imageUrl = output.url || output;
+
+          resultDiv.innerHTML = `
+            <img src="${imageUrl}" alt="Enhanced Photo">
+            <div class="user-name">Enhanced for: ${name}</div>
+          `;
+        } catch (err) {
+          console.error(err);
+          resultDiv.innerHTML = `
+            <p style="color:red;">❌ Error: Could not connect to AI backend.</p>
+            <p style="font-size:14px;">(Make sure your Hugging Face Space is running.)</p>
+          `;
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+
 </body>
 </html>
